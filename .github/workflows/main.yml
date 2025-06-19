@@ -1,0 +1,27 @@
+name: Laravel-deployment
+on:
+#   pull_request:
+#     types: [ closed ]
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # if: github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create zip deployment package
+        run: zip -r deploy.zip ./
+      - name: Deploy to elastic beanstalk
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: efiling_new
+          environment_name: Efilingnew-env
+          existing_bucket_name: elasticbeanstalk-eu-north-1-953491815896
+          version_label: 1
+          region: eu-north-1
+          deployment_package: deploy.zip
