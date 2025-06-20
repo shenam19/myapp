@@ -1,3 +1,12 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
 jobs:
   sonarcloud:
     name: SonarCloud
@@ -12,15 +21,10 @@ jobs:
         with:
           php-version: 8.2
 
-      - name: Install Composer dependencies
+      - name: Install PHP dependencies
         run: composer install --no-progress --no-suggest --prefer-dist
 
-      - name: Copy .env and generate app key
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-
-      - name: Install Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
@@ -31,12 +35,17 @@ jobs:
       - name: Build Vite assets
         run: npm run build
 
-      - name: Run tests with coverage
+      - name: Prepare Laravel
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Generate code coverage report
         run: ./vendor/bin/pest --coverage --coverage-clover=coverage.xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
-          organization: shenam19
-          projectKey: myapp
+          organization: shenam19  # ✅ Replace with your actual SonarCloud org key
+          projectKey: myapp       # ✅ Replace with your actual SonarCloud project key
           token: ${{ secrets.SONAR_TOKEN }}
