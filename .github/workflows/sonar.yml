@@ -27,7 +27,7 @@ jobs:
       - name: Generate code coverage report
         run: |
           mkdir -p tests
-          ./vendor/bin/phpunit --coverage-clover=coverage.xml
+          ./vendor/bin/pest --coverage --coverage-clover=coverage.xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
